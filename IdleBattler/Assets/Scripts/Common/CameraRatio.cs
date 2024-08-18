@@ -1,10 +1,13 @@
 using UnityEngine;
 
-public class ScreenStartSettings : MonoBehaviour
+public class CameraRatio : MonoBehaviour
 {
+    [SerializeField] private float m_TargetRatioWidth;
+    [SerializeField] private float m_TargetRatioHeight;
+
     private void Start()
     {
-        float targetaspect = 9.0f / 16.0f;
+        float targetaspect = m_TargetRatioWidth / m_TargetRatioHeight;
         float windowaspect = (float)Screen.width / (float)Screen.height;
         float scaleheight = windowaspect / targetaspect;
 
