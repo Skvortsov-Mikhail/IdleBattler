@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7893c5e31665239468dbc4db07f3deed, type: 3}
+  m_Name: ChainLightningAbility
+  m_EditorClassIdentifier: 
+  EnemiesAttackedAmount: 3
+  CooldownToNextEnemy: 0.1
+  CanHitBoss: 0
+  Damage: 10
+  DamageReductionMultiplierForEnemy: 0.15
+  AttackRadius: 4
+  Cooldown: 6
+  AudioClip: {fileID: 8300000, guid: 545483908232c6242bca60936c21aa1e, type: 3}

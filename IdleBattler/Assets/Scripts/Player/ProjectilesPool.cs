@@ -19,7 +19,7 @@ public class ProjectilesPool : MonoBehaviour
 
     private void Start()
     {
-        _pool = new ObjectPool<Projectile>(createFunc: () => _diContainer.InstantiatePrefab(m_ProjectilePrefab).GetComponent<Projectile>(),
+        _pool = new ObjectPool<Projectile>(createFunc: () => _diContainer.InstantiatePrefab(m_ProjectilePrefab, transform).GetComponent<Projectile>(),
             actionOnGet: (obj) => obj.gameObject.SetActive(true),
             actionOnRelease: (obj) => obj.gameObject.SetActive(false),
             actionOnDestroy: (obj) => Destroy(obj),
@@ -27,9 +27,4 @@ public class ProjectilesPool : MonoBehaviour
             defaultCapacity: 10,
             maxSize: 100);
     }
-    /*
-    private void OnDestroy()
-    {
-        _pool.Dispose();
-    }*/
 }

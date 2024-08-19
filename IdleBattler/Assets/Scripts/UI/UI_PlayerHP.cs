@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using static UnityEditor.Experimental.GraphView.GraphView;
 using Zenject;
 
 public class UI_PlayerHP : MonoBehaviour
@@ -19,6 +18,8 @@ public class UI_PlayerHP : MonoBehaviour
     private void Start()
     {
         _player.HPUpdated += OnHPUpdated;
+
+        OnHPUpdated(_player.MaxHP);
     }
 
     private void OnDestroy()
@@ -33,4 +34,3 @@ public class UI_PlayerHP : MonoBehaviour
         m_HPText.text = $"HP {currentHP}/{_player.MaxHP}";
     }
 }
-

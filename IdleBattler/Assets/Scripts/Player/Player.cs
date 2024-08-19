@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
@@ -13,15 +15,18 @@ public class Player : Destructible
     private float _attackRadius;
 
     private Timer _fireTimer;
+    private AudioSource _audio;
 
     public float ProjectileDamage => m_Damage;
     public float MaxHP => m_MaxHP;
 
     private ProjectilesPool _projectilesPool;
+    private EnemiesContainer _enemiesContainer;
     [Inject]
-    public void Construct(ProjectilesPool projectilesPool)
+    public void Construct(ProjectilesPool projectilesPool, EnemiesContainer enemiesContainer)
     {
         _projectilesPool = projectilesPool;
+        _enemiesContainer = enemiesContainer;
     }
 
     private void Start()
@@ -53,15 +58,57 @@ public class Player : Destructible
         CheckDeath();
     }
 
-    public bool DoSpecialAttack()
+    public bool DoSpecialAttack(AbilityConfiguration abilityConfiguration)
     {
-        return false; // TODO заглушка
+        if (abilityConfiguration.EnemiesAttackedAmount > 1)
+        {
+            StartCoroutine(DoMassAttack(abilityConfiguration));
+            return true;
+        }
+
+        /*
+         * 
+         * Возможно расширение по мере добавления способностей
+         * 
+         */
+
+        return true;
+    }
+
+    private IEnumerator DoMassAttack(AbilityConfiguration abilityConfiguration)
+    {
+        Vector2 searchingPosFrom = transform.position;
+
+        List<Enemy> excludedEnemies = new List<Enemy>();
+
+        float damage = abilityConfiguration.Damage;
+
+        for (int i = 0; i < abilityConfiguration.EnemiesAttackedAmount; i++)
+        {
+            var target = _enemiesContainer.GetNearestEnemy(searchingPosFrom, abilityConfiguration.AttackRadius, false, excludedEnemies);
+
+            if (target == null) break;
+
+            target.ApplyDamage(damage, true);
+
+            damage -= damage * abilityConfiguration.DamageReductionMultiplierForEnemy;
+            damage = (float)Math.Round(damage, 1);
+
+            excludedEnemies.Add(target);
+            searchingPosFrom = target.transform.position;
+
+            yield return new WaitForSeconds(abilityConfiguration.CooldownToNextEnemy);
+        }
+
+        StopCoroutine(DoMassAttack(abilityConfiguration));
     }
 
     private void CheckDeath()
     {
         if (_currentHP <= 0)
+        {
             PlayerDied?.Invoke();
+        }
     }
 
     private void InitPlayer()
@@ -72,45 +119,21 @@ public class Player : Destructible
         _attackRadius = m_PlayerConfiguration.AttackRadius;
 
         _currentHP = m_MaxHP;
+
+        _audio = GetComponent<AudioSource>();
     }
 
     private bool DoRegularAttack()
     {
-        var target = GetNearestEnemy(transform.position);
+        var target = _enemiesContainer.GetNearestEnemy(transform.position, _attackRadius);
 
         if (target == null) return false;
 
         var projectile = _projectilesPool.Pool.Get();
         projectile.SetNewValues(transform.position, target.transform.position);
 
+        _audio.Play();
+
         return true;
-    }
-
-    private Enemy GetNearestEnemy(Vector2 positionFrom)
-    {
-        Collider2D[] targets = Physics2D.OverlapCircleAll(positionFrom, _attackRadius);
-
-        if (targets.Length == 0) return null;
-
-        Enemy nearestEnemy = null;
-
-        float minDistance = float.MaxValue;
-
-        for (int i = 0; i < targets.Length; i++)
-        {
-            var enemy = targets[i].transform.root.GetComponent<Enemy>();
-
-            if (enemy == null) continue;
-
-            var distance = Vector2.Distance(targets[i].transform.position, positionFrom);
-
-            if (minDistance > distance)
-            {
-                minDistance = distance;
-                nearestEnemy = enemy;
-            }
-        }
-
-        return nearestEnemy;
     }
 }

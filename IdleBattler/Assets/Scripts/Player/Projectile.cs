@@ -8,6 +8,7 @@ public class Projectile : MonoBehaviour
     [SerializeField] private float m_LifeTime;
 
     private Timer _lifeCycleTimer;
+    private bool _isHit;
 
     private Player _player;
     private ProjectilesPool _projectilesPool;
@@ -34,11 +35,12 @@ public class Projectile : MonoBehaviour
     {
         var enemy = collision.GetComponent<Enemy>();
 
-        if (enemy != null)
+        if (enemy != null & _isHit == false)
         {
             GetComponent<Collider2D>().enabled = false;
 
             enemy.ApplyDamage(_player.ProjectileDamage);
+            _isHit = true;
 
             _projectilesPool.Pool.Release(this);
         }
@@ -56,6 +58,8 @@ public class Projectile : MonoBehaviour
         {
             _lifeCycleTimer.RestartTimer();
         }
+
+        _isHit = false;
 
         GetComponent<Collider2D>().enabled = true;
     }

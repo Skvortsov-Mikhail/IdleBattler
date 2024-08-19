@@ -12,10 +12,12 @@ public class EnemiesSpawner : MonoBehaviour
     private Timer _regEnemyTimer;
     private Timer _bossTimer;
 
+    private EnemiesContainer _enemiesContainer;
     private DiContainer _diContainer;
     [Inject]
-    public void Construct(DiContainer container)
+    public void Construct(EnemiesContainer enemiesContainer, DiContainer container)
     {
+        _enemiesContainer = enemiesContainer;
         _diContainer = container;
     }
 
@@ -27,6 +29,7 @@ public class EnemiesSpawner : MonoBehaviour
     private void Update()
     {
         UpdateTimers();
+
         TrySpawnEnemy();
     }
 
@@ -44,9 +47,9 @@ public class EnemiesSpawner : MonoBehaviour
 
     public void TrySpawnEnemy()
     {
-        if(_regEnemyTimer.IsFinished)
+        if (_regEnemyTimer.IsFinished)
         {
-            var enemy = _diContainer.InstantiatePrefab(m_EnemyPrefab);
+            var enemy = _diContainer.InstantiatePrefab(m_EnemyPrefab, _enemiesContainer.transform);
             enemy.GetComponent<Enemy>().InitEnemy(m_RegularEnemyConfiguration);
 
             enemy.transform.position = Random.insideUnitCircle.normalized * 6;

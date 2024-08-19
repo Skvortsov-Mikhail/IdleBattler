@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a0ab020ca0fcb644a1e0abe806cd465, type: 3}
   m_Name: Boss Enemy
   m_EditorClassIdentifier: 
+  EnemyType: 1
   MaxHP: 100
   Damage: 3
   AttackTime: 1

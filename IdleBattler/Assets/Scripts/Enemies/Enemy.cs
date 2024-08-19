@@ -4,8 +4,11 @@ using Zenject;
 
 public class Enemy : Destructible
 {
-    public event Action<float> EnemyDamaged;
+    public event Action<float, bool> EnemyDamaged;
     public event Action EnemyDied;
+
+    private EnemyType _enemyType;
+    public EnemyType EnemyType => _enemyType;
 
     private float _attackTime;
     private float _movementSpeed;
@@ -14,10 +17,14 @@ public class Enemy : Destructible
     private bool _isMoving;
 
     private Player _player;
+    private CoinManager _coinManager;
+    private DiContainer _diContainer;
     [Inject]
-    public void Construct(Player player)
+    public void Construct(Player player, CoinManager coinManager, DiContainer diContainer)
     {
         _player = player;
+        _coinManager = coinManager;
+        _diContainer = diContainer;
     }
 
     private void Start()
@@ -29,7 +36,7 @@ public class Enemy : Destructible
     {
         MoveToPlayer();
     }
-    
+
     private void OnTriggerStay2D(Collider2D collision)
     {
         var player = collision.GetComponent<Player>();
@@ -51,6 +58,7 @@ public class Enemy : Destructible
 
     public void InitEnemy(EnemyConfiguration config)
     {
+        _enemyType = config.EnemyType;
         m_MaxHP = config.MaxHP;
         m_Damage = config.Damage;
         _attackTime = config.AttackTime;
@@ -69,7 +77,16 @@ public class Enemy : Destructible
     {
         base.ApplyDamage(damage);
 
-        EnemyDamaged?.Invoke(damage);
+        EnemyDamaged?.Invoke(damage, false);
+
+        CheckDeath();
+    }
+
+    public void ApplyDamage(float damage, bool isAbility)
+    {
+        base.ApplyDamage(damage);
+
+        EnemyDamaged?.Invoke(damage, isAbility);
 
         CheckDeath();
     }
@@ -79,6 +96,9 @@ public class Enemy : Destructible
         if (_currentHP <= 0)
         {
             EnemyDied?.Invoke();
+
+            var coin = _diContainer.InstantiatePrefab(_coinManager.CoinPrefab, _coinManager.transform);
+            coin.transform.position = transform.position;
 
             Destroy(gameObject);
         }

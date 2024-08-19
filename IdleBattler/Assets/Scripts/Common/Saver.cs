@@ -2,62 +2,59 @@
 using System.IO;
 using UnityEngine;
 
-namespace TowerDefense
+[Serializable]
+public class Saver<T>
 {
-    [Serializable]
-    public class Saver<T>
+    public static void TryLoad(string filename, ref T data)
     {
-        public static void TryLoad(string filename, ref T data)
+        var path = FileHandler.Path(filename);
+
+        if (File.Exists(path))
         {
-            var path = FileHandler.Path(filename);
+            Debug.Log($"Loading from {path}");
 
-            if (File.Exists(path))
-            {
-                Debug.Log($"Loading from {path}");
-
-                var dataString = File.ReadAllText(path);
-                var saver = JsonUtility.FromJson<Saver<T>>(dataString);
-                data = saver.data;
-            }
-
-            else
-            {
-                Debug.Log($"No file at {path}");
-            }
-        }
-        
-        public static void Save(string filename, T data)
-        {
-            var wrapper = new Saver<T> { data = data };
-
-            var dataString = JsonUtility.ToJson(wrapper);
-
-            File.WriteAllText(FileHandler.Path(filename), dataString);
+            var dataString = File.ReadAllText(path);
+            var saver = JsonUtility.FromJson<Saver<T>>(dataString);
+            data = saver.data;
         }
 
-        public T data;
+        else
+        {
+            Debug.Log($"No file at {path}");
+        }
     }
 
-    public static class FileHandler
+    public static void Save(string filename, T data)
     {
-        public static string Path(string filename)
-        {
-            return $"{Application.persistentDataPath}/{filename}";
-        }
+        var wrapper = new Saver<T> { data = data };
 
-        public static void Reset(string filename)
-        {
-            var path = Path(filename);
+        var dataString = JsonUtility.ToJson(wrapper);
 
-            if (File.Exists(path))
-            {
-                File.Delete(path);
-            }
-        }
+        File.WriteAllText(FileHandler.Path(filename), dataString);
+    }
 
-        public static bool HasFile(string filename)
+    public T data;
+}
+
+public static class FileHandler
+{
+    public static string Path(string filename)
+    {
+        return $"{Application.persistentDataPath}/{filename}";
+    }
+
+    public static void Reset(string filename)
+    {
+        var path = Path(filename);
+
+        if (File.Exists(path))
         {
-            return File.Exists(Path(filename));
+            File.Delete(path);
         }
+    }
+
+    public static bool HasFile(string filename)
+    {
+        return File.Exists(Path(filename));
     }
 }

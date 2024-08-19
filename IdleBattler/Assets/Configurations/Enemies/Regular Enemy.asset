@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a0ab020ca0fcb644a1e0abe806cd465, type: 3}
   m_Name: Regular Enemy
   m_EditorClassIdentifier: 
+  EnemyType: 0
   MaxHP: 10
   Damage: 2
   AttackTime: 1
   MovementSpeed: 0.5
-  RespawnTime: 0.5
+  RespawnTime: 2
   VisualModel: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
