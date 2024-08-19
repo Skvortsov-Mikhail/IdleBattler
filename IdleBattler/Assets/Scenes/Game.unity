@@ -2489,6 +2489,7 @@ MonoBehaviour:
   m_EnemyPrefab: {fileID: 143072216865811958, guid: 08f2873a6f6b68744bdf50e3c3e3d4f8, type: 3}
   m_RegularEnemyConfiguration: {fileID: 11400000, guid: 5e7f0e37e8ccc3f4d8ac6eb41174b0e7, type: 2}
   m_BossEnemyConfiguration: {fileID: 11400000, guid: b657dff61f89493498bebb59042fdaf8, type: 2}
+  m_SpawnRadius: 6
 --- !u!4 &1610613124
 Transform:
   m_ObjectHideFlags: 0

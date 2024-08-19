@@ -9,6 +9,9 @@ public class EnemiesSpawner : MonoBehaviour
     [SerializeField] private EnemyConfiguration m_RegularEnemyConfiguration;
     [SerializeField] private EnemyConfiguration m_BossEnemyConfiguration;
 
+    [Space(10)]
+    [SerializeField] private float m_SpawnRadius;
+
     private Timer _regEnemyTimer;
     private Timer _bossTimer;
 
@@ -52,7 +55,7 @@ public class EnemiesSpawner : MonoBehaviour
             var enemy = _diContainer.InstantiatePrefab(m_EnemyPrefab, _enemiesContainer.transform);
             enemy.GetComponent<Enemy>().InitEnemy(m_RegularEnemyConfiguration);
 
-            enemy.transform.position = Random.insideUnitCircle.normalized * 6;
+            enemy.transform.position = Random.insideUnitCircle.normalized * m_SpawnRadius;
 
             _regEnemyTimer.RestartTimer();
         }
@@ -62,7 +65,7 @@ public class EnemiesSpawner : MonoBehaviour
             var boss = _diContainer.InstantiatePrefab(m_EnemyPrefab);
             boss.GetComponent<Enemy>().InitEnemy(m_BossEnemyConfiguration);
 
-            boss.transform.position = Random.insideUnitCircle.normalized * 6;
+            boss.transform.position = Random.insideUnitCircle.normalized * m_SpawnRadius;
 
             _bossTimer.RestartTimer();
         }
