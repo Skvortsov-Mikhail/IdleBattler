@@ -10,7 +10,7 @@ public class Projectile : MonoBehaviour
     private Timer _lifeCycleTimer;
     private bool _isHit;
 
-    private Rigidbody2D _rb;
+    // private Rigidbody2D _rb;
 
     private Player _player;
     private ProjectilesPool _projectilesPool;
@@ -21,11 +21,15 @@ public class Projectile : MonoBehaviour
         _projectilesPool = projectilesPool;
     }
 
-    private void Awake()
-    {
-        _rb = GetComponent<Rigidbody2D>();
-    }
-
+    /*
+     * Движение через физику вызывает неочевидный баг с OnTriggerStay2D() в Enemy.cs
+     * UPD: Наличие компонента Rigidbody2D на префабе Projectile выдает неправильное поведение метода OnTriggerStay2D() в Enemy.cs
+     * 
+     * private void Awake()
+     * {
+     *     _rb = GetComponent<Rigidbody2D>();
+     * }
+    */
     private void Start()
     {
         _lifeCycleTimer = new Timer(m_LifeTime);
@@ -33,6 +37,8 @@ public class Projectile : MonoBehaviour
 
     private void Update()
     {
+        MoveProjectile();
+
         UpdateTimer();
     }
 
@@ -52,11 +58,14 @@ public class Projectile : MonoBehaviour
 
     public void SetNewValues(Vector2 startPos, Vector2 targetPos)
     {
-        _rb.velocity = Vector3.zero;
-
         transform.position = startPos;
 
-        _rb.velocity = targetPos.normalized * m_Speed;
+        // _rb.velocity = Vector3.zero;
+        // _rb.velocity = targetPos.normalized * m_Speed;
+
+        var direction = targetPos - startPos;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
 
         if (_lifeCycleTimer != null)
         {
@@ -64,6 +73,11 @@ public class Projectile : MonoBehaviour
         }
 
         _isHit = false;
+    }
+
+    private void MoveProjectile()
+    {
+        transform.Translate(Vector2.right * Time.deltaTime * m_Speed);
     }
 
     private void UpdateTimer()
