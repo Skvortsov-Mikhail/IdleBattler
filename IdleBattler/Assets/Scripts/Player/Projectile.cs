@@ -10,6 +10,8 @@ public class Projectile : MonoBehaviour
     private Timer _lifeCycleTimer;
     private bool _isHit;
 
+    private Rigidbody2D _rb;
+
     private Player _player;
     private ProjectilesPool _projectilesPool;
     [Inject]
@@ -19,6 +21,11 @@ public class Projectile : MonoBehaviour
         _projectilesPool = projectilesPool;
     }
 
+    private void Awake()
+    {
+        _rb = GetComponent<Rigidbody2D>();
+    }
+
     private void Start()
     {
         _lifeCycleTimer = new Timer(m_LifeTime);
@@ -26,8 +33,6 @@ public class Projectile : MonoBehaviour
 
     private void Update()
     {
-        MoveProjectile();
-
         UpdateTimer();
     }
 
@@ -37,9 +42,8 @@ public class Projectile : MonoBehaviour
 
         if (enemy != null & _isHit == false)
         {
-            GetComponent<Collider2D>().enabled = false;
-
             enemy.ApplyDamage(_player.ProjectileDamage);
+
             _isHit = true;
 
             _projectilesPool.Pool.Release(this);
@@ -48,11 +52,11 @@ public class Projectile : MonoBehaviour
 
     public void SetNewValues(Vector2 startPos, Vector2 targetPos)
     {
+        _rb.velocity = Vector3.zero;
+
         transform.position = startPos;
 
-        var direction = targetPos - startPos;
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        _rb.velocity = targetPos.normalized * m_Speed;
 
         if (_lifeCycleTimer != null)
         {
@@ -60,13 +64,6 @@ public class Projectile : MonoBehaviour
         }
 
         _isHit = false;
-
-        GetComponent<Collider2D>().enabled = true;
-    }
-
-    private void MoveProjectile()
-    {
-        transform.Translate(Vector2.right * Time.deltaTime * m_Speed);
     }
 
     private void UpdateTimer()
